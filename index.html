@@ -4,182 +4,256 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>قلبي يا قلبي ❤️</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&family=Tajawal:wght@700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            background-color: #0b0b0b;
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: #050505;
             color: #ffffff;
-            font-family: 'Tahoma', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
             overflow: hidden;
-            position: relative;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* العبارة العلوية */
-        .header-text {
+        /* Strong glow effect matching screenshot */
+        .glow-heart {
+            filter: drop-shadow(0 0 20px #ff2a5f) drop-shadow(0 0 40px #ff0044);
+        }
+
+        .glow-text {
+            text-shadow: 0 0 15px #ff2a5f, 0 0 30px #ff0044, 0 0 50px #ff0044;
+        }
+
+        /* Ambient floating hearts background */
+        .bg-heart {
             position: absolute;
-            top: 40px;
-            font-size: 1.5rem;
-            color: #ff80bf;
-            font-style: italic;
-            text-shadow: 0 0 15px #ff3366;
-            animation: fadeIn 2s ease forwards 0.5s;
-            opacity: 0;
-            z-index: 10;
-        }
-
-        /* حاوية القلب النابض */
-        .heart-container {
-            position: relative;
-            cursor: pointer;
-            animation: heartbeat 1.2s infinite ease-in-out;
-            z-index: 10;
-        }
-
-        /* تصميم القلب الاحترافي المتحرك */
-        .heart {
-            position: relative;
-            width: 120px;
-            height: 110px;
-        }
-
-        .heart::before,
-        .heart::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            width: 62px;
-            height: 95px;
-            border-radius: 60px 60px 0 0;
-            background: linear-gradient(135deg, #ff3366, #ff1a75);
-            box-shadow: 0 0 30px #ff3366, 0 0 60px #ff1a75;
-        }
-
-        .heart::before {
-            left: 60px;
-            transform: rotate(-45deg);
-            transform-origin: 0 100%;
-        }
-
-        .heart::after {
-            left: 0;
-            transform: rotate(45deg);
-            transform-origin: 100% 100%;
-        }
-
-        /* حركة النبض الساحرة */
-        @keyframes heartbeat {
-            0% { transform: scale(1); }
-            15% { transform: scale(1.25); }
-            30% { transform: scale(1); }
-            45% { transform: scale(1.15); }
-            60% { transform: scale(1); }
-        }
-
-        /* النص السفلي */
-        .footer-text {
-            position: absolute;
-            bottom: 50px;
-            font-size: 3rem;
-            font-weight: bold;
-            color: #ffffff;
-            text-shadow: 0 0 20px #ff3366, 0 0 40px #ff3366;
-            animation: fadeIn 2s ease forwards 1s;
-            opacity: 0;
-            z-index: 10;
-        }
-
-        /* النجوم والقلوب الصغيرة المتطايرة في الخلفية */
-        .floating-heart {
-            position: absolute;
-            color: rgba(255, 51, 102, 0.6);
-            font-size: 20px;
-            animation: floatUp 4s linear infinite;
-            z-index: 1;
+            color: rgba(255, 30, 80, 0.25);
+            pointer-events: none;
+            animation: floatUp linear infinite;
         }
 
         @keyframes floatUp {
             0% {
-                transform: translateY(100vh) scale(0.5);
+                transform: translateY(105vh) scale(0.6) rotate(0deg);
                 opacity: 0;
             }
-            50% { opacity: 1; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.6; }
             100% {
-                transform: translateY(-10vh) scale(1.3);
+                transform: translateY(-10vh) scale(1.1) rotate(360deg);
                 opacity: 0;
             }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Heart pulsing after drawing completes */
+        @keyframes heartbeat {
+            0%, 100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 20px #ff2a5f) drop-shadow(0 0 35px #ff0044);
+            }
+            50% {
+                transform: scale(1.12);
+                filter: drop-shadow(0 0 30px #ff2a5f) drop-shadow(0 0 55px #ff0044);
+            }
+        }
+
+        .pulse-heart {
+            animation: heartbeat 1.3s ease-in-out infinite;
         }
     </style>
 </head>
-<body>
+<body class="h-screen w-screen flex flex-col items-center justify-center relative bg-black select-none">
 
-    <div class="header-text">✨ أنت أجمل ما رأت عيني ✨</div>
+    <!-- Floating background hearts container -->
+    <div id="bg-hearts-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
 
-    <!-- القلب النابض في المنتصف -->
-    <div class="heart-container" onclick="createBurst()">
-        <div class="heart"></div>
+    <!-- Main Content Box -->
+    <div class="relative z-10 flex flex-col items-center justify-center p-4 text-center cursor-pointer">
+        
+        <!-- Canvas for dynamic heart drawing animation -->
+        <div class="relative flex items-center justify-center min-h-[260px] min-w-[260px]">
+            <canvas id="heartCanvas" width="340" height="300" class="glow-heart transition-transform duration-300"></canvas>
+        </div>
+
+        <!-- Text below the heart, revealed after drawing completes -->
+        <div class="mt-2 flex items-center justify-center gap-2">
+            <h1 id="romanticText" class="text-5xl sm:text-6xl font-black text-white glow-text opacity-0 transition-opacity duration-1000 flex items-center gap-3">
+                <span class="text-rose-500 text-4xl sm:text-5xl drop-shadow-[0_0_15px_#ff0044]">❤️</span> قلبي
+            </h1>
+        </div>
+
     </div>
 
-    <div class="footer-text">قلبي ❤️</div>
-
     <script>
-        // توليد قلوب صغيرة متطايرة باستمرار في الخلفية
-        function createBgHeart() {
-            const heart = document.createElement('div');
-            heart.classList.add('floating-heart');
-            heart.innerHTML = '❤️';
-            heart.style.left = Math.random() * window.innerWidth + 'px';
-            heart.style.animationDuration = (Math.random() * 2 + 3) + 's';
-            document.body.appendChild(heart);
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+        const romanticTextEl = document.getElementById('romanticText');
 
-            setTimeout(() => {
-                heart.remove();
-            }, 4000);
+        const width = canvas.width;
+        const height = canvas.height;
+        const center = { x: width / 2, y: height / 2 - 15 };
+
+        let heartOutlinePoints = [];
+        let drawnParticles = [];
+        let burstParticles = [];
+        let isDrawComplete = false;
+
+        // Generate mathematical heart shape points
+        function generateHeartPoints() {
+            const points = [];
+            const totalPoints = 160;
+            for (let i = 0; i < totalPoints; i++) {
+                const t = (i / totalPoints) * Math.PI * 2;
+                const x = 16 * Math.pow(Math.sin(t), 3);
+                const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+                
+                const scale = 9.5;
+                points.push({
+                    x: center.x + x * scale,
+                    y: center.y + y * scale
+                });
+            }
+            return points;
         }
 
-        setInterval(createBgHeart, 250);
+        heartOutlinePoints = generateHeartPoints();
+        let currentPointIndex = 0;
+        let speed = 2; // Steps per frame
 
-        // تأثير انفجار قلوب عند النقر على القلب الكبير
-        function createBurst() {
-            for (let i = 0; i < 20; i++) {
-                const burst = document.createElement('div');
-                burst.classList.add('floating-heart');
-                burst.innerHTML = '💖';
-                burst.style.left = (window.innerWidth / 2) + 'px';
-                burst.style.top = (window.innerHeight / 2) + 'px';
+        // Step-by-step drawing animation (starts completely blank)
+        function drawAnimatedHeartStroke() {
+            ctx.clearRect(0, 0, width, height);
+
+            if (currentPointIndex < heartOutlinePoints.length) {
+                for (let i = 0; i < speed && currentPointIndex < heartOutlinePoints.length; i++) {
+                    drawnParticles.push(heartOutlinePoints[currentPointIndex]);
+                    currentPointIndex++;
+                }
+            } else {
+                if (!isDrawComplete) {
+                    isDrawComplete = true;
+                    onHeartComplete();
+                }
+            }
+
+            // Draw current stroke path
+            if (drawnParticles.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(drawnParticles[0].x, drawnParticles[0].y);
+                for (let i = 1; i < drawnParticles.length; i++) {
+                    ctx.lineTo(drawnParticles[i].x, drawnParticles[i].y);
+                }
+                ctx.closePath();
+
+                ctx.strokeStyle = '#ff2a5f';
+                ctx.lineWidth = 5;
+                ctx.shadowColor = '#ff0044';
+                ctx.shadowBlur = 25;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.stroke();
+
+                // Fill glowing red inside when drawing finishes
+                if (isDrawComplete) {
+                    const fillGradient = ctx.createRadialGradient(center.x, center.y, 10, center.x, center.y, 100);
+                    fillGradient.addColorStop(0, '#ff2a5f');
+                    fillGradient.addColorStop(0.7, '#ff0044');
+                    fillGradient.addColorStop(1, '#cc0033');
+                    
+                    ctx.fillStyle = fillGradient;
+                    ctx.fill();
+                }
+            }
+
+            // Render burst particles on click
+            updateBurstParticles();
+
+            requestAnimationFrame(drawAnimatedHeartStroke);
+        }
+
+        // Action when heart outline finishes forming
+        function onHeartComplete() {
+            canvas.classList.add('pulse-heart');
+            // Show "قلبي ❤️" text smoothly
+            setTimeout(() => {
+                romanticTextEl.classList.remove('opacity-0');
+            }, 300);
+        }
+
+        // Click Burst Particle Class
+        class BurstParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 8 + 4;
+                this.speedX = (Math.random() - 0.5) * 7;
+                this.speedY = (Math.random() - 0.5) * 7 - 2;
+                this.opacity = 1;
+                this.decay = Math.random() * 0.025 + 0.015;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.opacity -= this.decay;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.opacity);
+                ctx.fillStyle = '#ff2a5f';
+                ctx.shadowColor = '#ff0044';
+                ctx.shadowBlur = 12;
                 
-                const angle = Math.random() * Math.PI * 2;
-                const distance = Math.random() * 180 + 60;
-                const targetX = Math.cos(angle) * distance;
-                const targetY = Math.sin(angle) * distance;
-
-                burst.style.transition = 'all 0.8s ease-out';
-                document.body.appendChild(burst);
-
-                setTimeout(() => {
-                    burst.style.transform = `translate(${targetX}px, ${targetY}px) scale(1.6)`;
-                    burst.style.opacity = '0';
-                }, 10);
-
-                setTimeout(() => {
-                    burst.remove();
-                }, 800);
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
             }
         }
-    </script>
-</body>
-</html>
+
+        function createBurst(x, y) {
+            for (let i = 0; i < 25; i++) {
+                burstParticles.push(new BurstParticle(x, y));
+            }
+        }
+
+        function updateBurstParticles() {
+            for (let i = burstParticles.length - 1; i >= 0; i--) {
+                burstParticles[i].update();
+                burstParticles[i].draw();
+                if (burstParticles[i].opacity <= 0) {
+                    burstParticles.splice(i, 1);
+                }
+            }
+        }
+
+        // Ambient Background Floating Hearts
+        function createAmbientHearts() {
+            const container = document.getElementById('bg-hearts-container');
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('i');
+                heart.className = 'fa-solid fa-heart bg-heart';
+                heart.style.left = `${Math.random() * 100}%`;
+                heart.style.fontSize = `${Math.random() * 16 + 10}px`;
+                heart.style.animationDuration = `${Math.random() * 6 + 5}s`;
+                heart.style.animationDelay = `${Math.random() * 4}s`;
+                container.appendChild(heart);
+            }
+        }
+
+        // Interactive Click/Touch explosion
+        window.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            if (x >= 0 && x <= width && y >= 0 && y <= height) {
+                createBurst(x, y);

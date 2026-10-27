@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قلبي ❤️</title>
+    <title>قلبي يا قلبي ❤️</title>
     <style>
         * {
             margin: 0;
@@ -31,53 +31,96 @@
             font-size: 1.5rem;
             color: #ff80bf;
             font-style: italic;
-            text-shadow: 0 0 10px #ff3366;
+            text-shadow: 0 0 15px #ff3366;
+            animation: fadeIn 2s ease forwards 0.5s;
             opacity: 0;
-            animation: fadeIn 2s ease forwards 4s;
             z-index: 10;
         }
 
-        /* حاوية الرسم البياني */
-        .canvas-container {
+        /* حاوية القلب النابض */
+        .heart-container {
             position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            cursor: pointer;
+            animation: heartbeat 1.2s infinite ease-in-out;
+            z-index: 10;
         }
 
-        canvas {
-            z-index: 5;
+        /* تصميم القلب الاحترافي المتحرك */
+        .heart {
+            position: relative;
+            width: 120px;
+            height: 110px;
+        }
+
+        .heart::before,
+        .heart::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            width: 62px;
+            height: 95px;
+            border-radius: 60px 60px 0 0;
+            background: linear-gradient(135deg, #ff3366, #ff1a75);
+            box-shadow: 0 0 30px #ff3366, 0 0 60px #ff1a75;
+        }
+
+        .heart::before {
+            left: 60px;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+
+        .heart::after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+
+        /* حركة النبض الساحرة */
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.25); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); }
+            60% { transform: scale(1); }
         }
 
         /* النص السفلي */
         .footer-text {
             position: absolute;
             bottom: 50px;
-            font-size: 2.8rem;
+            font-size: 3rem;
             font-weight: bold;
             color: #ffffff;
-            text-shadow: 0 0 15px #ff3366, 0 0 30px #ff3366;
+            text-shadow: 0 0 20px #ff3366, 0 0 40px #ff3366;
+            animation: fadeIn 2s ease forwards 1s;
             opacity: 0;
-            animation: fadeIn 2s ease forwards 4.5s;
             z-index: 10;
         }
 
-        /* خلفية النجوم المتلألئة */
-        .star {
+        /* النجوم والقلوب الصغيرة المتطايرة في الخلفية */
+        .floating-heart {
             position: absolute;
-            border-radius: 50%;
-            background-color: #ffffff;
-            animation: twinkle var(--duration) infinite ease-in-out;
+            color: rgba(255, 51, 102, 0.6);
+            font-size: 20px;
+            animation: floatUp 4s linear infinite;
             z-index: 1;
         }
 
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.2; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1.3); }
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) scale(0.5);
+                opacity: 0;
+            }
+            50% { opacity: 1; }
+            100% {
+                transform: translateY(-10vh) scale(1.3);
+                opacity: 0;
+            }
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
@@ -86,81 +129,57 @@
 
     <div class="header-text">✨ أنت أجمل ما رأت عيني ✨</div>
 
-    <div class="canvas-container">
-        <canvas id="heartCanvas" width="600" height="500"></canvas>
+    <!-- القلب النابض في المنتصف -->
+    <div class="heart-container" onclick="createBurst()">
+        <div class="heart"></div>
     </div>
 
     <div class="footer-text">قلبي ❤️</div>
 
     <script>
-        // إنشاء النجوم في الخلفية
-        for (let i = 0; i < 40; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            const size = Math.random() * 4 + 2;
-            star.style.width = `${size}px`;
-            star.style.height = `${size}px`;
-            star.style.left = `${Math.random() * 100}vw`;
-            star.style.top = `${Math.random() * 100}vh`;
-            star.style.setProperty('--duration', `${Math.random() * 3 + 2}s`);
-            star.style.backgroundColor = ['#ff99bb', '#ff1a75', '#ffffff', '#ff4d4d'][Math.floor(Math.random() * 4)];
-            document.body.appendChild(star);
+        // توليد قلوب صغيرة متطايرة باستمرار في الخلفية
+        function createBgHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('floating-heart');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * window.innerWidth + 'px';
+            heart.style.animationDuration = (Math.random() * 2 + 3) + 's';
+            document.body.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 4000);
         }
 
-        // إعداد الرسم التدريجي على Canvas
-        const canvas = document.getElementById('heartCanvas');
-        const ctx = canvas.getContext('2d');
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2 - 20;
+        setInterval(createBgHeart, 250);
 
-        let t = 0;
-        const maxT = Math.PI * 2;
-        const step = 0.03;
-
-        // دالة تحويل معادلة القلب الرياضية
-        function getHeartPoint(angle, scale = 12) {
-            const x = 16 * Math.pow(Math.sin(angle), 3);
-            const y = -(13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle));
-            return {
-                x: centerX + x * scale,
-                y: centerY + y * scale
-            };
-        }
-
-        // رسم القلب الرئيسي خطوة بخطوة أمام عين المستخدم
-        function drawMainHeart() {
-            if (t <= maxT) {
-                const point = getHeartPoint(t);
+        // تأثير انفجار قلوب عند النقر على القلب الكبير
+        function createBurst() {
+            for (let i = 0; i < 20; i++) {
+                const burst = document.createElement('div');
+                burst.classList.add('floating-heart');
+                burst.innerHTML = '💖';
+                burst.style.left = (window.innerWidth / 2) + 'px';
+                burst.style.top = (window.innerHeight / 2) + 'px';
                 
-                if (t === 0) {
-                    ctx.beginPath();
-                    ctx.moveTo(point.x, point.y);
-                } else {
-                    ctx.lineTo(point.x, point.y);
-                }
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 180 + 60;
+                const targetX = Math.cos(angle) * distance;
+                const targetY = Math.sin(angle) * distance;
 
-                ctx.strokeStyle = '#ff3366';
-                ctx.lineWidth = 4;
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = '#ff1a75';
-                ctx.stroke();
+                burst.style.transition = 'all 0.8s ease-out';
+                document.body.appendChild(burst);
 
-                t += step;
-                requestAnimationFrame(drawMainHeart);
-            } else {
-                // تظليل داخل القلب بعد اكتمال الرسم
-                ctx.fillStyle = 'rgba(255, 51, 102, 0.85)';
-                ctx.fill();
-                
-                // بدء رسم القلوب الجانبية
-                drawSideHearts();
+                setTimeout(() => {
+                    burst.style.transform = `translate(${targetX}px, ${targetY}px) scale(1.6)`;
+                    burst.style.opacity = '0';
+                }, 10);
+
+                setTimeout(() => {
+                    burst.remove();
+                }, 800);
             }
         }
-
-        // دالة رسم قلب صغير
-        function drawSmallHeart(cx, cy, scale) {
-            ctx.save();
-            ctx.beginPath();
-            for (let angle = 0; angle <= Math.PI * 2; angle += 0.05) {
-                const x = 16 * Math.pow(Math.sin(angle), 3);
-                const y = -(13 * Math.
+    </script>
+</body>
+</html>
